@@ -58,6 +58,7 @@ function drawMatrix(matrix, x, y) {
     }
 }
 
+
 let interval = 1000;
 let lastTime = 0;
 let count = 0;
@@ -82,5 +83,28 @@ function update(time = 0) {
     requestAnimationFrame(update);
 
 }
+
+document.addEventListener("keydown", event => {
+
+    if (event.keyCode === 37 && interval - 1) {
+        player.pos.x--;
+        if (collides(player, arena))
+            player.pos.x++;
+    } else if (event.keyCode === 39 && interval - 1) {
+        player.pos.x++;
+        if (collides(player, arena))
+            player.pos.x--;
+    } else if (event.keyCode === 40) {
+        player.pos.y++;
+        count = 0;
+    } else if (event.keyCode === 38) {
+        player.matrix = rotateMatrix(player.matrix, 1);
+        if (collides(player, arena))
+            player.matrix = rotateMatrix(player.matrix, -1);
+    } else if (event.keyCode === 32) {
+        interval = 1;
+    }
+
+});
 
 update();
