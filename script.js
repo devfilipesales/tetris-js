@@ -45,12 +45,30 @@ const pieces = [
         [0, 7, 0]
     ]
 ];
-const arena = [];
+const colors = [
+    null,
+    '#FF0D72',
+    '#0DC2FF',
+    '#0DFF72',
+    '#F538FF',
+    '#FF8E0D',
+    '#FFE138',
+    '#3877FF'
+];
+
+let arena = [];
+
+let rand;
 
 const player = {
-    pos: { x: 0, y: 0 },
-    matrix: pieces[3]
+    pos: { x: 0, y: 1 },
+    matrix: null,
+    color: null
 }
+
+rand = Math.floor(Math.random() * pieces.length);
+player.matrix = pieces[rand];
+player.color = colors[rand + 1];
 
 function drawMatrix(matrix, x, y) {
     for (let i = 0; i < matrix.length; i++) {
@@ -95,8 +113,48 @@ function collides(player, arena) {
     return 0;
 }
 
+function mergeArena(matrix, x, y) {
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[i].length; j++) {
+            arena[y + i + 1][x + j + 1] = arena[y + i + 1][x + j + 1] || matrix[i][j];
+        }
+    }
+}
+
+function clearBlocks() {
+    for (let i = 1; i < arena.length - 2; i++) {
+        let clear = 1;
+
+        for (let j = 1; j < arena[i].length - 1; j++) {
+            if (!arena[i][j])
+                clear = 0;
+        }
+
+        if (clear) {
+            let r = new Array(tWidth).fill(0);
+            r.push(1);
+            r.unshift(1);
+
+            arena.splice(i, 1);
+            arena.splice(1, 0, r);
+        }
+    }
+}
+
+function drawArena() {
+    for (let i = 1; i < arena.length - 2; i++) {
+        for (let j = 1; j < arena[i].length - 1; j++) {
+            if (arena[i][j]) {
+                ctx.fillStyle = colors[arena[i][j]];
+                ctx.fillRect(j - 1, i - 1, 1, 1);
+            }
+        }
+    }
+}
 
 function initArena() {
+    arena = [];
+
     const r = new Array(tWidth + 2).fill(1);
     arena.push(r);
 
@@ -105,10 +163,19 @@ function initArena() {
         row.push(1);
         row.unshift(1);
 
+        arena.push(row);
     }
 
     arena.push(r);
     arena.push(r);
+}
+
+function gameOver() {
+    for (let j = 1; j < arena[1].length - 1; j++)
+        if (arena[1][j])
+            return initArena();
+
+    return;
 }
 
 let interval = 1000;
@@ -121,23 +188,34 @@ function update(time = 0) {
     lastTime = time;
     count += dt;
 
-    if (collides(player, arena)) {
-        console.log('oof');
-    }
-
     if (count >= interval) {
         player.pos.y++;
         count = 0;
     }
 
+    if (collides(player, arena)) {
+        mergeArena(player.matrix, player.pos.x, player.pos.y - 1);
+        clearBlocks();
+        gameOver();
+
+        player.pos.y = 1;
+        player.pos.x = 0;
+
+        rand = Math.floor(Math.random() * pieces.length);
+        player.matrix = pieces[rand];
+        player.color = colors[rand + 1];
+
+        interval = 1000;
+    }
+
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = "red";
+    drawArena();
+    ctx.fillStyle = player.color;
     drawMatrix(player.matrix, player.pos.x, player.pos.y);
 
     requestAnimationFrame(update);
-
 }
 
 document.addEventListener("keydown", event => {
