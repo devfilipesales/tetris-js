@@ -61,6 +61,30 @@ function drawMatrix(matrix, x, y) {
     }
 }
 
+function rotateMatrix(matrix, dir) {
+    let newMatrix = [];
+
+    for (let i in matrix)
+        newMatrix.push([]);
+
+    if (dir === 1) {
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix[i].length; j++) {
+                newMatrix[j][matrix.length - i - 1] = matrix[i][j];
+            }
+        }
+    } else {
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix[i].length; j++) {
+                newMatrix[matrix.length - j - 1][i] = matrix[i][j];
+            }
+        }
+    }
+
+    return newMatrix;
+}
+
+
 function initArena() {
     const r = new Array(tWidth + 2).fill(1);
     arena.push(r);
