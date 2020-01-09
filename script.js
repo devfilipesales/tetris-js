@@ -84,6 +84,17 @@ function rotateMatrix(matrix, dir) {
     return newMatrix;
 }
 
+function collides(player, arena) {
+    for (let i = 0; i < player.matrix.length; i++) {
+        for (let j = 0; j < player.matrix[i].length; j++) {
+            if (player.matrix[i][j] && arena[player.pos.y + i + 1][player.pos.x + j + 1])
+                return 1;
+        }
+    }
+
+    return 0;
+}
+
 
 function initArena() {
     const r = new Array(tWidth + 2).fill(1);
@@ -109,6 +120,10 @@ function update(time = 0) {
     const dt = time - lastTime;
     lastTime = time;
     count += dt;
+
+    if (collides(player, arena)) {
+        console.log('oof');
+    }
 
     if (count >= interval) {
         player.pos.y++;
