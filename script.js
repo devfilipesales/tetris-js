@@ -1,9 +1,12 @@
 const canvas = document.getElementById("tetris");
 const ctx = canvas.getContext('2d');
 
-ctx.scale(20, 20);
+const scale = 20;
 
-// ctx.fillRect(0, 0, 1, 1);
+ctx.scale(scale, scale);
+
+const tWidth = canvas.width / scale;
+const tHeight = canvas.height / scale;
 
 const pieces = [
     [
@@ -58,6 +61,20 @@ function drawMatrix(matrix, x, y) {
     }
 }
 
+function initArena() {
+    const r = new Array(tWidth + 2).fill(1);
+    arena.push(r);
+
+    for (let i = 0; i < tHeight; i++) {
+        let row = new Array(tWidth).fill(0);
+        row.push(1);
+        row.unshift(1);
+
+    }
+
+    arena.push(r);
+    arena.push(r);
+}
 
 let interval = 1000;
 let lastTime = 0;
@@ -107,4 +124,5 @@ document.addEventListener("keydown", event => {
 
 });
 
+initArena();
 update();
